@@ -350,9 +350,13 @@ func (self *LocalCommitsController) reword(commit *models.Commit) error {
 	if self.c.UserConfig().Git.Commit.AutoWrapCommitMessage {
 		commitMessage = helpers.TryRemoveHardLineBreaks(commitMessage, self.c.UserConfig().Git.Commit.AutoWrapWidth)
 	}
+	commitIdx := self.context().GetSelectedLineIdx()
+	if self.c.Git().Config.NeedsGpgSubprocessForCommit() && !self.isHeadCommit(commitIdx) {
+		return errors.New(self.c.Tr.DisabledForGPG)
+	}
 	self.c.Helpers().Commits.OpenCommitMessagePanel(
 		&helpers.OpenCommitMessagePanelOpts{
-			CommitIndex:      self.context().GetSelectedLineIdx(),
+			CommitIndex:      commitIdx,
 			InitialMessage:   commitMessage,
 			SummaryTitle:     self.c.Tr.Actions.RewordCommit,
 			DescriptionTitle: self.c.Tr.CommitDescriptionTitle,
