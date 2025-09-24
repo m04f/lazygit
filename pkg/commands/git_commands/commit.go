@@ -292,6 +292,7 @@ func (self *CommitCommands) ShowFileContentCmdObj(hash string, filePath string) 
 // pass -m 1 even for non-merge commits, but older versions of git choke on it.
 func (self *CommitCommands) Revert(hashes []string, isMerge bool) error {
 	cmdArgs := NewGitCmd("revert").
+		ArgIf(self.signoffFlag() != "", self.signoffFlag()).
 		ArgIf(isMerge, "-m", "1").
 		Arg(hashes...).
 		ToArgv()
